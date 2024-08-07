@@ -1,24 +1,23 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsDate, IsOptional, IsString } from 'class-validator';
 
-import { IsDate, IsString } from "class-validator";
+import { Transform } from 'class-transformer';
 
 export class CreateGalleryDto {
-    constructor(partial: Partial<CreateGalleryDto>) {
-        Object.assign(this, partial);
-    }
+  @ApiProperty({ default: 'This is a title' })
+  @IsString({ message: 'Title must be a string' })
+  title: string;
 
-    @ApiProperty({ default: 'This is a title' })
-    @IsString({ message: 'Title must be a string' })
-    title: string;
+  @ApiPropertyOptional({ default: 'This is a description' })
+  @IsString({ message: 'Description must be a string' })
+  description: string;
 
-    @ApiPropertyOptional({ default: 'This is a description' })
-    @IsString({ message: 'Description must be a string' })
-    description: string;
+  @ApiPropertyOptional({ default: new Date() })
+  @Transform(({ value }) => new Date(value))
+  @IsOptional()
+  @IsDate()
+  createdAt?: Date;
 
-    @ApiPropertyOptional({ default: new Date() })
-    @IsDate({ message: 'Date must be a date' })
-    createdAt: Date;
-
-    @ApiProperty({ type: 'string', format: 'binary', required: true })
-    image: string;
+  @ApiProperty({ type: 'string', format: 'binary' })
+  image: string;
 }

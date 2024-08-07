@@ -1,7 +1,7 @@
-export type Image = {
+export type ImageType = {
     id: string;
     title: string;
-    imageUrl: string;
+    imageUri: string;
     description: string;
     createdAt: Date;
 };
