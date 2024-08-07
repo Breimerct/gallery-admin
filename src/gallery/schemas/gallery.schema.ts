@@ -4,9 +4,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type ImageDocument = HydratedDocument<Image>;
 
-@Schema({
-  versionKey: false,
-})
+@Schema({ versionKey: false })
 export class Image {
   @Prop({ required: true })
   title: string;
