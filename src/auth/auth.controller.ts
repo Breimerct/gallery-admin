@@ -70,7 +70,7 @@ export class AuthController {
     return this.authService.updatePassword(id, passwordDto);
   }
 
-  @Post('reset-password/send-email')
+  @Post('forgot-password')
   @ApiOperation({
     summary: 'Send reset password email',
     description: 'send reset password email to user',
