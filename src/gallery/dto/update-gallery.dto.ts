@@ -7,4 +7,7 @@ export class UpdateGalleryDto extends PartialType(CreateGalleryDto) {
   @ApiProperty()
   @IsMongoId({ message: 'Invalid image id' })
   _id: string;
+
+  @ApiProperty()
+  order: number;
 }

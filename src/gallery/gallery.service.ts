@@ -1,4 +1,9 @@
-import { getRootPath, getUrlImg, internalServerError } from '@/helpers/utils';
+import {
+  getRootPath,
+  getUrlImg,
+  internalServerError,
+  toLowerCaseObject,
+} from '@/helpers/utils';
 import {
   BadRequestException,
   HttpStatus,
@@ -6,23 +11,23 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { type ImageType } from '@/typings/types';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { Request } from 'express';
 import { existsSync } from 'fs';
-import { Connection, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { CreateGalleryDto } from './dto/create-gallery.dto';
 import { ImageResponseDto } from './dto/image.response.dto';
 import { UpdateGalleryDto } from './dto/update-gallery.dto';
 import { Image } from './schemas/gallery.schema';
+import { UserService } from '@/user/user.service';
 
 @Injectable()
 export class GalleryService {
   constructor(
     @InjectModel(Image.name)
-    private readonly imageModel: Model<ImageType>,
-    @InjectConnection() private readonly connection: Connection,
+    private readonly imageModel: Model<Image>,
+    private readonly userService: UserService,
   ) {}
 
   async create(
@@ -33,16 +38,18 @@ export class GalleryService {
     const protocol = resquest.protocol;
     const host = resquest.get('host');
     const url = getUrlImg(protocol, host, image.filename);
+    const lowerCaseDto = toLowerCaseObject(createGalleryDto, ['userId']);
 
     const totalImages = await this.imageModel
       .countDocuments()
       .catch(internalServerError);
 
     const newImage = {
-      title: createGalleryDto.title,
-      description: createGalleryDto.description,
+      title: lowerCaseDto.title,
+      description: lowerCaseDto.description,
+      createdAt: lowerCaseDto?.createdAt,
+      userId: lowerCaseDto.userId,
       imageUri: url,
-      createdAt: createGalleryDto?.createdAt,
       order: totalImages + 1,
     };
 
@@ -64,9 +71,19 @@ export class GalleryService {
     return rootPath;
   }
 
-  async findAll() {
+  async findAllByUserId(userId: string) {
+    const user = await this.userService
+      .findOne({ _id: userId })
+      .catch(internalServerError);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     const allImages = await this.imageModel
       .find()
+      .where('userId')
+      .equals(userId)
       .lean()
       .catch(internalServerError);
 
@@ -88,19 +105,14 @@ export class GalleryService {
 
   async update(id: string, updateGalleryDto: UpdateGalleryDto) {
     const image = await this.imageModel.findById(id).catch(internalServerError);
+    const lowerCaseDto = toLowerCaseObject(updateGalleryDto, ['userId']);
 
     if (!image) {
       throw new NotFoundException('Image not found');
     }
 
-    const objectResponse = plainToClass(ImageResponseDto, image);
-
     const updated = await this.imageModel
-      .findByIdAndUpdate(
-        id,
-        { $set: objectResponse },
-        { new: true, lean: true },
-      )
+      .findByIdAndUpdate(id, { $set: lowerCaseDto }, { new: true, lean: true })
       .catch(internalServerError);
 
     return plainToClass(ImageResponseDto, updated);
@@ -108,8 +120,12 @@ export class GalleryService {
 
   async updateMany(updateDtos: UpdateGalleryDto[]) {
     const backupDocuments = [];
+    const lowerCaseDtos = updateDtos.map(dto => {
+      return toLowerCaseObject(dto, ['userId']);
+    });
+
     try {
-      for (const updateDto of updateDtos) {
+      for (const updateDto of lowerCaseDtos) {
         const originalDocument = await this.imageModel
           .findById(updateDto._id)
           .exec()
@@ -121,7 +137,10 @@ export class GalleryService {
           .updateOne({ _id: updateDto._id }, { $set: updateDto })
           .exec();
       }
-      return { success: true };
+      return {
+        status: HttpStatus.OK,
+        message: 'Images have been successfully updated',
+      };
     } catch (error) {
       for (const backup of backupDocuments) {
         await this.imageModel

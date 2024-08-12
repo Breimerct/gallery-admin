@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
-import { HydratedDocument } from 'mongoose';
+import { User } from '@/user/schemas/user.schema';
 
 export type ImageDocument = HydratedDocument<Image>;
 
@@ -20,6 +21,13 @@ export class Image {
 
   @Prop({ required: false, default: new Date() })
   createdAt: Date;
+
+  @Prop({
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User.name,
+  })
+  userId: string;
 }
 
 export const ImageSchema = SchemaFactory.createForClass(Image);

@@ -1,9 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDate, IsOptional, IsString } from 'class-validator';
-
-import { Transform } from 'class-transformer';
+import { IsMongoId, IsOptional, IsString } from 'class-validator';
 
 export class CreateGalleryDto {
+  @ApiProperty()
+  @IsMongoId({ message: 'Id must be a mongoId' })
+  userId: string;
+  
   @ApiProperty({ default: 'This is a title' })
   @IsString({ message: 'Title must be a string' })
   title: string;
@@ -12,10 +14,8 @@ export class CreateGalleryDto {
   @IsString({ message: 'Description must be a string' })
   description: string;
 
-  @ApiPropertyOptional({ default: new Date() })
-  @Transform(({ value }) => new Date(value))
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsDate()
   createdAt?: Date;
 
   @ApiProperty({ type: 'string', format: 'binary' })
