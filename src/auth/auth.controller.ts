@@ -3,6 +3,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -32,7 +33,7 @@ export class AuthController {
     description: 'Register a new user',
   })
   @ApiResponse({
-    status: 201,
+    status: HttpStatus.CREATED,
     description: 'User has been successfully registered',
     type: AuthResponseDto,
   })
@@ -46,7 +47,7 @@ export class AuthController {
     description: 'Login with email and password',
   })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'User has been successfully logged in',
     type: AuthResponseDto,
   })
@@ -62,7 +63,7 @@ export class AuthController {
     description: 'Update password of a user',
   })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Password has been successfully updated',
     type: ResponseUserDto,
   })
@@ -76,7 +77,7 @@ export class AuthController {
     description: 'send reset password email to user',
   })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Email has been successfully sent',
     type: ResponseMessageDto,
   })
@@ -90,7 +91,7 @@ export class AuthController {
     description: 'Reset password with token',
   })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Password has been successfully reset',
     type: ResponseMessageDto,
   })
