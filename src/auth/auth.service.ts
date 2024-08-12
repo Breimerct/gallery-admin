@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  HttpStatus,
-  Injectable
-} from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   hashPassword,
   internalServerError,
@@ -16,6 +12,7 @@ import { EmailService } from '@/email/email.service';
 import { JWT_SECRET_KEY } from '@/constants';
 import { JwtService } from '@nestjs/jwt';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResponseMessageDto } from '@/common/dto/response-message.dto';
 import { ResponseUserDto } from '@/user/dto/response-user.dto';
 import { UpdatePassDto } from './dto/update-pass.dto';
 import { UserService } from '@/user/user.service';
@@ -96,7 +93,10 @@ export class AuthService {
     return plainToClass(ResponseUserDto, updatedUser);
   }
 
-  async sendPasswordResetEmail({ email, frontUrl }: EmailResetPassDto) {
+  async sendPasswordResetEmail({
+    email,
+    frontUrl,
+  }: EmailResetPassDto): Promise<ResponseMessageDto> {
     const user = await this.userService.findOne({
       email,
     });
@@ -113,12 +113,14 @@ export class AuthService {
         return {
           status: HttpStatus.OK,
           message: 'Email sent successfully',
-          token,
         };
-      })
+      });
   }
 
-  async resetPasswordWithToken({ token, newPassword }: ResetPasswordDto) {
+  async resetPasswordWithToken({
+    token,
+    newPassword,
+  }: ResetPasswordDto): Promise<ResponseMessageDto> {
     const user = await this.validateResetPasswordToken(token);
     const newPasswordHash = await hashPassword(newPassword);
 

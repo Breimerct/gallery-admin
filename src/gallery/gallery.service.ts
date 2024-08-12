@@ -21,6 +21,7 @@ import { ImageResponseDto } from './dto/image.response.dto';
 import { UpdateGalleryDto } from './dto/update-gallery.dto';
 import { Image } from './schemas/gallery.schema';
 import { UserService } from '@/user/user.service';
+import { ResponseMessageDto } from '@/common/dto/response-message.dto';
 
 @Injectable()
 export class GalleryService {
@@ -118,7 +119,7 @@ export class GalleryService {
     return plainToClass(ImageResponseDto, updated);
   }
 
-  async updateMany(updateDtos: UpdateGalleryDto[]) {
+  async updateMany(updateDtos: UpdateGalleryDto[]): Promise<ResponseMessageDto> {
     const backupDocuments = [];
     const lowerCaseDtos = updateDtos.map(dto => {
       return toLowerCaseObject(dto, ['userId']);
