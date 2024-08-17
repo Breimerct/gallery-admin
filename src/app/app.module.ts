@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '@/auth/auth.module';
 import { GalleryModule } from '@/gallery/gallery.module';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { JwtTokenModule } from '@/jwt-token/jwt-token.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -48,6 +49,7 @@ import { UserModule } from '@/user/user.module';
     GalleryModule,
     UserModule,
     AuthModule,
+    JwtTokenModule
   ],
 })
 export class AppModule {}
