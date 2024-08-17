@@ -39,7 +39,6 @@ import { ValidateFileInterceptor } from './interceptor/validate-file/validate-fi
 import { ValidateMongoIdGuard } from '@/common/guards/validate-mongo-id/validate-mongo-id.guard';
 
 @Controller('gallery')
-@ApiBearerAuth()
 @ApiTags('Gallery')
 @UseInterceptors(ClassSerializerInterceptor)
 export class GalleryController {
@@ -47,6 +46,7 @@ export class GalleryController {
 
   @Post('image')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create image',
     description: 'Create image',
@@ -117,6 +117,7 @@ export class GalleryController {
   @Get('image/:id')
   @UseGuards(AuthGuard)
   @UseGuards(ValidateMongoIdGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get one image',
     description: 'Get one image by id',
@@ -132,6 +133,7 @@ export class GalleryController {
 
   @Patch('images/update-many')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update many images',
     description: 'Update many images at once',
@@ -151,6 +153,7 @@ export class GalleryController {
   @Patch('image:id')
   @UseGuards(AuthGuard)
   @UseGuards(ValidateMongoIdGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update image',
     description: 'Update image by id',
@@ -167,6 +170,7 @@ export class GalleryController {
   @Delete('image/:id')
   @UseGuards(AuthGuard)
   @UseGuards(ValidateMongoIdGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Delete image',
     description: 'Delete image by id',
