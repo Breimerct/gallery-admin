@@ -94,7 +94,7 @@ export class GalleryController {
     return this.galleryService.updateMany(updateGalleryDto);
   }
 
-  @Patch('image:id')
+  @Patch('image/:id')
   @UseGuards(AuthGuard)
   @UseGuards(ValidateMongoIdGuard)
   @UpdateImageDoc()
