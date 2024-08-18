@@ -15,8 +15,10 @@ export class JwtToken {
   @Prop({ required: true })
   userId: string;
 
-  @Prop({ required: false, default: false })
-  isUsed: string;
+  @Prop({ required: false, default: null })
+  expirationDate: Date;
 }
 
 export const JwtTokenSchema = SchemaFactory.createForClass(JwtToken);
+
+JwtTokenSchema.index({ expirationDate: 1 }, { expireAfterSeconds: 0 });
