@@ -7,8 +7,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtToken } from './schemas/jwt-token.schema';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { internalServerError } from '@/helpers/utils';
-import { JWT_SECRET_KEY, twoWeeksFromNow } from '@/constants';
+import { internalServerError, validateMongoId } from '@/helpers/utils';
+import { JWT_SECRET_KEY } from '@/constants';
 import { EXPIRATION_OPTIONS } from '@/constants/expirationOptions';
 
 @Injectable()
@@ -49,7 +49,9 @@ export class JwtTokenService {
   }
 
   async verifyToken(tokenId: string): Promise<string> {
-    const { token, ...rest } = await this.jwtTokenModel
+    validateMongoId(tokenId);
+
+    const { token } = await this.jwtTokenModel
       .findById(tokenId)
       .lean()
       .catch(internalServerError);
@@ -68,7 +70,7 @@ export class JwtTokenService {
 
     await this.jwtTokenModel.findByIdAndUpdate(tokenId, {
       $set: {
-        expirationDate: twoWeeksFromNow,
+        expirationDate: EXPIRATION_OPTIONS['2w'].expirationDate,
       },
     });
 
