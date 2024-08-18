@@ -49,7 +49,6 @@ export class GalleryService {
       description: lowerCaseDto.description,
       createdAt: lowerCaseDto?.createdAt,
       userId: lowerCaseDto.userId,
-      nicknameUser: lowerCaseDto.nicknameUser,
       imageUri: url,
       order: totalImages + 1,
     };
@@ -84,7 +83,7 @@ export class GalleryService {
     const allImages = await this.imageModel
       .find()
       .where('userId')
-      .equals(nicknameUser)
+      .equals(user._id)
       .lean()
       .catch(internalServerError);
 
