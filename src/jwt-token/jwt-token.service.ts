@@ -31,12 +31,14 @@ export class JwtTokenService {
       .catch(internalServerError);
 
     if (!!token) {
-      await this.jwtTokenModel.findByIdAndUpdate(token._id, {
-        $set: {
-          token: tokenString,
-          expirationDate,
-        },
-      });
+      await this.jwtTokenModel
+        .findByIdAndUpdate(token._id, {
+          $set: {
+            token: tokenString,
+            expirationDate,
+          },
+        })
+        .catch(internalServerError);
 
       return token._id.toString();
     }
@@ -68,11 +70,13 @@ export class JwtTokenService {
         throw new UnauthorizedException('Invalid token or token expired');
       });
 
-    await this.jwtTokenModel.findByIdAndUpdate(tokenId, {
-      $set: {
-        expirationDate: EXPIRATION_OPTIONS['2w'].expirationDate,
-      },
-    });
+    await this.jwtTokenModel
+      .findByIdAndUpdate(tokenId, {
+        $set: {
+          expirationDate: EXPIRATION_OPTIONS['2w'].expirationDate,
+        },
+      })
+      .catch(internalServerError);
 
     return userId;
   }
