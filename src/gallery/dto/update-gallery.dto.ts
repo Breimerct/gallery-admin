@@ -10,4 +10,7 @@ export class UpdateGalleryDto extends PartialType(CreateGalleryDto) {
 
   @ApiPropertyOptional()
   order: number;
+
+  @ApiPropertyOptional()
+  createdAt: Date;
 }

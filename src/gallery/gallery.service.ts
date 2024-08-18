@@ -106,7 +106,7 @@ export class GalleryService {
 
   async update(id: string, updateGalleryDto: UpdateGalleryDto) {
     const image = await this.imageModel.findById(id).catch(internalServerError);
-    const lowerCaseDto = toLowerCaseObject(updateGalleryDto, ['userId']);
+    const lowerCaseDto = toLowerCaseObject(updateGalleryDto, ['userId', 'nicknameUser']);
 
     if (!image) {
       throw new NotFoundException('Image not found');
