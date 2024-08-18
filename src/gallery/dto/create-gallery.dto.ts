@@ -1,7 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsMongoId, IsOptional, IsString } from 'class-validator';
-
-import { Exclude } from 'class-transformer';
+import { IsMongoId, IsString } from 'class-validator';
 
 export class CreateGalleryDto {
   @ApiProperty()
@@ -20,7 +18,7 @@ export class CreateGalleryDto {
   @IsString({ message: 'Description must be a string' })
   description: string;
 
-  @Exclude()
+  @ApiPropertyOptional({ default: new Date() })
   createdAt?: Date;
 
   @ApiProperty({ type: 'string', format: 'binary' })

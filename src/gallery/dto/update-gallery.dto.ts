@@ -1,9 +1,7 @@
-import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsMongoId, IsString } from 'class-validator';
 
-import { CreateGalleryDto } from './create-gallery.dto';
-import { IsMongoId } from 'class-validator';
-
-export class UpdateGalleryDto extends PartialType(CreateGalleryDto) {
+export class UpdateGalleryDto{
   @ApiProperty()
   @IsMongoId({ message: 'Invalid image id' })
   _id: string;
@@ -13,4 +11,15 @@ export class UpdateGalleryDto extends PartialType(CreateGalleryDto) {
 
   @ApiPropertyOptional()
   createdAt: Date;
+
+  @ApiProperty({ default: 'This is a title' })
+  @IsString({ message: 'Title must be a string' })
+  title: string;
+
+  @ApiPropertyOptional({ default: 'This is a description' })
+  @IsString({ message: 'Description must be a string' })
+  description: string;
+
+  @ApiProperty({ type: 'string', format: 'binary' })
+  image: string;
 }
