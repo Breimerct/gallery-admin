@@ -7,6 +7,7 @@ import {
 
 import { Request } from 'express';
 import mongoose from 'mongoose';
+import { validateMongoId } from '@/helpers/utils';
 
 @Injectable()
 export class ValidateMongoIdGuard implements CanActivate {
@@ -14,9 +15,7 @@ export class ValidateMongoIdGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const mongoId: string = String(request.params?.id || request.query?.id);
 
-    if (!mongoose.Types.ObjectId.isValid(mongoId)) {
-      throw new BadRequestException(`id ${mongoId} is invalid`);
-    }
+    validateMongoId(mongoId);
 
     return true;
   }

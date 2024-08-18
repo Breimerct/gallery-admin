@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { Request } from 'express';
+import mongoose from 'mongoose';
 import { rootPath } from '@/constants';
 
 export const editFileName = (
@@ -78,4 +79,10 @@ export const validatePassword = async (
   }
 
   return await bcrypt.compare(password, hashPassword);
+};
+
+export const validateMongoId = (mongoId: string) => {
+  if (!mongoose.Types.ObjectId.isValid(mongoId)) {
+    throw new BadRequestException(`id ${mongoId} is invalid`);
+  }
 };
