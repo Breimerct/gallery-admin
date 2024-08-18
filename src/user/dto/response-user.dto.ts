@@ -35,4 +35,10 @@ export class ResponseUserDto {
 
   @Exclude()
   password: string;
+
+  @ApiProperty()
+  updatedAt: Date;
+
+  @Exclude()
+  createdAt: Date;
 }
