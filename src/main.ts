@@ -24,6 +24,14 @@ async function bootstrap() {
 
   SwaggerModule.setup('api/doc', app, document);
 
+  app.use((req, res, next) => {
+    if (req.path === '/') {
+      res.redirect('/api/doc');
+    } else {
+      next();
+    }
+  });
+
   await app
     .listen(PORT)
     .then(() => {
