@@ -1,12 +1,10 @@
 import {
-  BadRequestException,
   CanActivate,
   ExecutionContext,
-  Injectable,
+  Injectable
 } from '@nestjs/common';
 
 import { Request } from 'express';
-import mongoose from 'mongoose';
 import { validateMongoId } from '@/helpers/utils';
 
 @Injectable()

@@ -32,6 +32,14 @@ export class UserService {
       email: lowerCaseDto.email,
     });
 
+    const existWithNickname = await this.userModel.exists({
+      nickname: lowerCaseDto.nickname,
+    });
+
+    if (existWithNickname) {
+      throw new BadRequestException('Nickname already exists in another user');
+    }
+
     if (existUserWithEmail) {
       throw new BadRequestException('Email already exists in another user');
     }
@@ -72,6 +80,15 @@ export class UserService {
       email: lowerCaseDto.email,
       $and: [{ _id: { $ne: id } }],
     });
+
+    const existWithNickname = await this.userModel.exists({
+      nickname: lowerCaseDto.nickname,
+      $and: [{ _id: { $ne: id } }],
+    });
+
+    if (existWithNickname && user.nickname !== lowerCaseDto.nickname) {
+      throw new BadRequestException('Nickname already exists in another user');
+    }
 
     if (existUserWithEmail && user.email !== lowerCaseDto.email) {
       throw new BadRequestException('Email already exists in another user');

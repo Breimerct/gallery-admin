@@ -13,6 +13,9 @@ export class ResponseUserDto {
   _id: string;
 
   @ApiProperty()
+  nickname: string;
+
+  @ApiProperty()
   name: string;
 
   @ApiProperty()
