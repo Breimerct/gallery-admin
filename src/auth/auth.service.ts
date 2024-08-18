@@ -9,8 +9,7 @@ import { AuthLoginDto } from './dto/auth-login.dto';
 import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { EmailResetPassDto } from './dto/emal-reset-pass';
 import { EmailService } from '@/email/email.service';
-import { JWT_SECRET_KEY } from '@/constants';
-import { JwtService } from '@nestjs/jwt';
+import { JwtTokenService } from '@/jwt-token/jwt-token.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResponseMessageDto } from '@/common/dto/response-message.dto';
 import { ResponseUserDto } from '@/user/dto/response-user.dto';
@@ -22,7 +21,7 @@ import { plainToClass } from 'class-transformer';
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+    private readonly jwtTokenService: JwtTokenService,
     private readonly emailService: EmailService,
   ) {}
 
@@ -36,28 +35,22 @@ export class AuthService {
       throw new BadRequestException('Password is incorrect');
     }
 
-    const payload = { email: user.email, _id: user._id };
-    const token = await this.jwtService
-      .signAsync(payload)
-      .catch(internalServerError);
+    const tokenId = await this.jwtTokenService.createToken(user._id.toString());
 
     return {
       user: plainToClass(ResponseUserDto, user),
-      token,
+      token: tokenId,
     };
   }
 
   async register(userDto: CreateUserDto) {
     const newUser = await this.userService.create(userDto);
 
-    const payload = { email: newUser.email, _id: newUser._id };
-    const token = await this.jwtService
-      .signAsync(payload)
-      .catch(internalServerError);
+    const tokenId = await this.jwtTokenService.createToken(newUser._id.toString());
 
     return {
       user: plainToClass(ResponseUserDto, newUser),
-      token,
+      token: tokenId,
     };
   }
 
@@ -101,10 +94,8 @@ export class AuthService {
       email,
     });
 
-    const payload = { email: user.email, _id: user._id };
-
-    const token = await this.jwtService
-      .signAsync(payload, { expiresIn: '1h' })
+    const token = await this.jwtTokenService
+      .createToken(user._id.toString(), "1h")
       .catch(internalServerError);
 
     return await this.emailService
@@ -130,19 +121,28 @@ export class AuthService {
       })
       .catch(internalServerError);
 
+    await this.jwtTokenService.deleteToken(token);
+
     return {
       status: HttpStatus.OK,
       message: 'Password has been successfully reset',
     };
   }
 
+  async logout(tokenId: string) {
+    await this.jwtTokenService.deleteToken(tokenId);
+
+    return {
+      status: HttpStatus.OK,
+      message: 'Logout successfully',
+    };
+  }
+
   private async validateResetPasswordToken(token: string) {
     try {
-      const { email } = await this.jwtService.verifyAsync(token, {
-        secret: JWT_SECRET_KEY,
-      });
+      const _id = await this.jwtTokenService.verifyToken(token);
 
-      const user = await this.userService.findOne({ email });
+      const user = await this.userService.findOne({ _id });
 
       return plainToClass(ResponseUserDto, user);
     } catch (error) {

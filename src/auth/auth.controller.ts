@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -53,6 +54,23 @@ export class AuthController {
   })
   login(@Body() loginDto: AuthLoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('logout')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @ApiOperation({
+    summary: 'Logout',
+    description: 'Logout from the system',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User has been successfully logged out',
+    type: ResponseMessageDto,
+  })
+  logout(@Req() request: Request) {
+    const tokenId = request['token'];
+    return this.authService.logout(tokenId);
   }
 
   @Put('update-password/:id')
