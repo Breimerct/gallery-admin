@@ -72,9 +72,7 @@ export class GalleryService {
   }
 
   async findAllByNicknameUser(nicknameUser: string) {
-    const user = await this.userService
-      .findOne({ nickname: nicknameUser })
-      .catch(internalServerError);
+    const user = await this.userService.findOne({ nickname: nicknameUser });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -105,7 +103,10 @@ export class GalleryService {
 
   async update(id: string, updateGalleryDto: UpdateGalleryDto) {
     const image = await this.imageModel.findById(id).catch(internalServerError);
-    const lowerCaseDto = toLowerCaseObject(updateGalleryDto, ['userId', 'nicknameUser']);
+    const lowerCaseDto = toLowerCaseObject(updateGalleryDto, [
+      'userId',
+      'nicknameUser',
+    ]);
 
     if (!image) {
       throw new NotFoundException('Image not found');
@@ -118,7 +119,9 @@ export class GalleryService {
     return plainToClass(ImageResponseDto, updated);
   }
 
-  async updateMany(updateDtos: UpdateGalleryDto[]): Promise<ResponseMessageDto> {
+  async updateMany(
+    updateDtos: UpdateGalleryDto[],
+  ): Promise<ResponseMessageDto> {
     const backupDocuments = [];
     const lowerCaseDtos = updateDtos.map(dto => {
       return toLowerCaseObject(dto, ['userId']);

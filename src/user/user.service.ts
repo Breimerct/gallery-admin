@@ -26,7 +26,7 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const lowerCaseDto = toLowerCaseObject<CreateUserDto>(createUserDto, [
       'password',
-      'nickname'
+      'nickname',
     ]);
 
     const existUserWithEmail = await this.userModel.exists({
