@@ -26,6 +26,7 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const lowerCaseDto = toLowerCaseObject<CreateUserDto>(createUserDto, [
       'password',
+      'nickname'
     ]);
 
     const existUserWithEmail = await this.userModel.exists({
@@ -72,6 +73,7 @@ export class UserService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     const lowerCaseDto = toLowerCaseObject<UpdateUserDto>(updateUserDto, [
       'password',
+      'nickname',
     ]);
 
     const user = await this.findOne({ _id: id });
