@@ -40,11 +40,11 @@ export function GetAllImagesDoc() {
       type: [ImageResponseDto],
     }),
     ApiParam({
-      name: 'id',
+      name: 'nickname',
       type: 'string',
       required: true,
-      example: '60f7b5d9e0b4c5f1f0e3c4b7',
-      description: 'User id',
+      example: 'usertest',
+      description: 'User nickname',
     }),
   );
 }

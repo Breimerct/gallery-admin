@@ -6,19 +6,18 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Delete,
-  Get, Param,
+  Get,
+  Param,
   Patch,
   Post,
   Req,
   Res,
   UploadedFile,
   UseGuards,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  ApiTags
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { diskStorage } from 'multer';
 import { CreateGalleryDto } from './dto/create-gallery.dto';
@@ -27,7 +26,15 @@ import { GalleryService } from './gallery.service';
 import { AuthGuard } from '@/auth/guard/auth.guard';
 import { ValidateFileInterceptor } from './interceptor/validate-file/validate-file.interceptor';
 import { ValidateMongoIdGuard } from '@/common/guards/validate-mongo-id/validate-mongo-id.guard';
-import { CreateImageDoc, GetAllImagesDoc, GetImageFileDoc, GetOneImageDoc, RemoveImageDoc, UpdateImageDoc, UpdateManyDoc } from './doc';
+import {
+  CreateImageDoc,
+  GetAllImagesDoc,
+  GetImageFileDoc,
+  GetOneImageDoc,
+  RemoveImageDoc,
+  UpdateImageDoc,
+  UpdateManyDoc,
+} from './doc';
 
 @Controller('gallery')
 @ApiTags('Gallery')
@@ -52,7 +59,10 @@ export class GalleryController {
     @UploadedFile() image: Express.Multer.File,
     @Req() request: Request,
   ) {
-    return this.galleryService.create(createGalleryDto, image, request);
+    const protocol = request.protocol;
+    const host = request.get('host');
+
+    return this.galleryService.create(createGalleryDto, image, protocol, host);
   }
 
   @Get('image/:imgName')
@@ -63,11 +73,10 @@ export class GalleryController {
     res.sendFile(imagePath);
   }
 
-  @Get('images/:id')
-  @UseGuards(ValidateMongoIdGuard)
+  @Get('images/:nickname')
   @GetAllImagesDoc()
-  findAll(@Param('id') userId: string) {
-    return this.galleryService.findAllByUserId(userId);
+  findAll(@Param('nickname') nickname: string) {
+    return this.galleryService.findAllByNicknameUser(nickname);
   }
 
   @Get('image/:id')

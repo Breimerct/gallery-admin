@@ -22,6 +22,9 @@ export class Image {
   @Prop({ required: false, default: new Date() })
   createdAt: Date;
 
+  @Prop({ required: false })
+  nicknameUser: string;
+
   @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,

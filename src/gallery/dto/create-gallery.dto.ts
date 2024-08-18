@@ -5,6 +5,10 @@ export class CreateGalleryDto {
   @ApiProperty()
   @IsMongoId({ message: 'Id must be a mongoId' })
   userId: string;
+
+  @ApiProperty()
+  @IsString({ message: 'Nickname must be a string' })
+  nicknameUser: string;
   
   @ApiProperty({ default: 'This is a title' })
   @IsString({ message: 'Title must be a string' })

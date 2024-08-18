@@ -34,10 +34,9 @@ export class GalleryService {
   async create(
     createGalleryDto: CreateGalleryDto,
     image: Express.Multer.File,
-    resquest: Request,
+    protocol: string,
+    host: string,
   ) {
-    const protocol = resquest.protocol;
-    const host = resquest.get('host');
     const url = getUrlImg(protocol, host, image.filename);
     const lowerCaseDto = toLowerCaseObject(createGalleryDto, ['userId']);
 
@@ -45,11 +44,12 @@ export class GalleryService {
       .countDocuments()
       .catch(internalServerError);
 
-    const newImage = {
+    const newImage: Image = {
       title: lowerCaseDto.title,
       description: lowerCaseDto.description,
       createdAt: lowerCaseDto?.createdAt,
       userId: lowerCaseDto.userId,
+      nicknameUser: lowerCaseDto.nicknameUser,
       imageUri: url,
       order: totalImages + 1,
     };
@@ -72,9 +72,9 @@ export class GalleryService {
     return rootPath;
   }
 
-  async findAllByUserId(userId: string) {
+  async findAllByNicknameUser(nicknameUser: string) {
     const user = await this.userService
-      .findOne({ _id: userId })
+      .findOne({ nickname: nicknameUser })
       .catch(internalServerError);
 
     if (!user) {
@@ -84,7 +84,7 @@ export class GalleryService {
     const allImages = await this.imageModel
       .find()
       .where('userId')
-      .equals(userId)
+      .equals(nicknameUser)
       .lean()
       .catch(internalServerError);
 

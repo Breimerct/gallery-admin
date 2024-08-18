@@ -1,5 +1,6 @@
+import { Exclude, Transform } from 'class-transformer';
+
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 
 export class ImageResponseDto {
   constructor(partial: Partial<ImageResponseDto>) {
@@ -25,7 +26,9 @@ export class ImageResponseDto {
   @ApiProperty()
   order: number;
 
-  @ApiProperty()
-  @Transform(({ value }) => value.toString())
+  @Exclude()
   userId: string;
+
+  @Exclude()
+  nicknameUser: string;
 }
