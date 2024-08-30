@@ -88,11 +88,19 @@ export class UserService {
       $and: [{ _id: { $ne: id } }],
     });
 
-    if (existWithNickname && user.nickname !== lowerCaseDto.nickname) {
+    if (
+      lowerCaseDto?.nickname &&
+      existWithNickname &&
+      user.nickname !== lowerCaseDto.nickname
+    ) {
       throw new BadRequestException('Nickname already exists in another user');
     }
 
-    if (existUserWithEmail && user.email !== lowerCaseDto.email) {
+    if (
+      lowerCaseDto.email &&
+      existUserWithEmail &&
+      user.email !== lowerCaseDto.email
+    ) {
       throw new BadRequestException('Email already exists in another user');
     }
 

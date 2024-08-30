@@ -46,7 +46,9 @@ export class AuthService {
   async register(userDto: CreateUserDto) {
     const newUser = await this.userService.create(userDto);
 
-    const tokenId = await this.jwtTokenService.createToken(newUser._id.toString());
+    const tokenId = await this.jwtTokenService.createToken(
+      newUser._id.toString(),
+    );
 
     return {
       user: plainToClass(ResponseUserDto, newUser),
@@ -95,7 +97,7 @@ export class AuthService {
     });
 
     const token = await this.jwtTokenService
-      .createToken(user._id.toString(), "1h")
+      .createToken(user._id.toString(), '1h')
       .catch(internalServerError);
 
     return await this.emailService
@@ -115,11 +117,9 @@ export class AuthService {
     const user = await this.validateResetPasswordToken(token);
     const newPasswordHash = await hashPassword(newPassword);
 
-    await this.userService
-      .update(user._id, {
-        password: newPasswordHash,
-      })
-      .catch(internalServerError);
+    await this.userService.update(user._id, {
+      password: newPasswordHash,
+    });
 
     await this.jwtTokenService.deleteToken(token);
 
