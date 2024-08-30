@@ -96,9 +96,10 @@ export class AuthService {
       email,
     });
 
-    const token = await this.jwtTokenService
-      .createToken(user._id.toString(), '1h')
-      .catch(internalServerError);
+    const token = await this.jwtTokenService.createToken(
+      user._id.toString(),
+      '1h',
+    );
 
     return await this.emailService
       .sendPasswordResetEmail(frontUrl, email, token)
@@ -139,14 +140,10 @@ export class AuthService {
   }
 
   private async validateResetPasswordToken(token: string) {
-    try {
-      const _id = await this.jwtTokenService.verifyToken(token);
+    const _id = await this.jwtTokenService.verifyToken(token);
 
-      const user = await this.userService.findOne({ _id });
+    const user = await this.userService.findOne({ _id });
 
-      return plainToClass(ResponseUserDto, user);
-    } catch (error) {
-      throw new BadRequestException('Invalid or expired token');
-    }
+    return plainToClass(ResponseUserDto, user);
   }
 }

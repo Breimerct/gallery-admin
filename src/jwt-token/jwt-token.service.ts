@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -24,24 +25,9 @@ export class JwtTokenService {
   ) {
     const { expiresIn, expirationDate } = EXPIRATION_OPTIONS[expiresInOption];
 
-    const token = await this.jwtTokenModel.findOne({ userId }).lean();
-
     const tokenString = await this.jwtService
       .signAsync({ userId }, { expiresIn: expiresIn })
       .catch(internalServerError);
-
-    if (!!token) {
-      await this.jwtTokenModel
-        .findByIdAndUpdate(token._id, {
-          $set: {
-            token: tokenString,
-            expirationDate,
-          },
-        })
-        .catch(internalServerError);
-
-      return token._id.toString();
-    }
 
     const { _id } = await this.jwtTokenModel
       .create({ token: tokenString, userId, expirationDate })
@@ -53,32 +39,43 @@ export class JwtTokenService {
   async verifyToken(tokenId: string): Promise<string> {
     validateMongoId(tokenId);
 
-    const { token } = await this.jwtTokenModel
-      .findById(tokenId)
-      .lean()
-      .catch(internalServerError);
+    const token = await this.findOneToken({ _id: tokenId });
 
     if (!token) {
       throw new NotFoundException('Token not found');
     }
 
-    const { userId } = await this.jwtService
-      .verifyAsync(token, {
-        secret: JWT_SECRET_KEY,
-      })
-      .catch(() => {
-        throw new UnauthorizedException('Invalid token or token expired');
-      });
-
-    await this.jwtTokenModel
-      .findByIdAndUpdate(tokenId, {
-        $set: {
-          expirationDate: EXPIRATION_OPTIONS['2w'].expirationDate,
-        },
-      })
-      .catch(internalServerError);
+    const { userId } = await this.verifyTokenString(token.token).catch(
+      () => {
+        this.deleteToken(tokenId);
+        throw new UnauthorizedException('Invalid or expired token');
+      },
+    );
 
     return userId;
+  }
+
+  async findOneToken(fields: Partial<JwtToken & { _id: string }>) {
+    const token = await this.jwtTokenModel
+      .findOne(fields)
+      .lean()
+      .catch(internalServerError);
+
+    console.log(token);
+
+    return token;
+  }
+
+  generateToken(userId: string, expiresIn: string) {
+    return this.jwtService
+      .signAsync({ userId }, { expiresIn })
+      .catch(internalServerError);
+  }
+
+  verifyTokenString(token: string) {
+    return this.jwtService.verifyAsync<{ userId: string }>(token, {
+      secret: JWT_SECRET_KEY,
+    });
   }
 
   async deleteToken(tokenId: string) {
